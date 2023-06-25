@@ -15,7 +15,7 @@ Install the following dependencies:
 or use the following command to install dependencies using Conda:
 
 ```bash
-conda env create -f conda.yml
+conda env create -f environment.yml
 ```
 
 Build the project:
