@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
   auto tls_context =
       http2_client::create_context(ssl::context::tlsv12_client, false);
   auto client =
-      http2_client::client(io_context, tls_context, "nghttp2.org", "443");
+      http2_client::client(io_context, tls_context, "https://nghttp2.org");
 
   co_spawn(io_context, run(client), detached);
   io_context.run();

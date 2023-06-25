@@ -1,9 +1,12 @@
 #include "session_tcp.h"
 
 namespace http2_client {
+const std::string session_tcp::scheme = "http";
+const std::string session_tcp::default_port = "80";
+
 session_tcp::session_tcp(io_context &io_context, const std::string &host,
                          const std::string &port)
-    : session(io_context, host, port, "http"), socket_(io_context) {}
+    : session(io_context, host, port, scheme), socket_(io_context) {}
 
 session_tcp::~session_tcp() {}
 

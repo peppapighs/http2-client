@@ -49,4 +49,20 @@ bool select_protocol(unsigned char **out, unsigned char *outlen,
 std::vector<unsigned char> make_alpn_string();
 
 bool is_http2_negotiated(ssl::stream<ip::tcp::socket> &socket);
+
+template <typename Session>
+std::pair<std::string, std::string> parse_url(const std::string &url) {
+  auto parsed_url = boost::urls::parse_uri_reference(url);
+  if (!parsed_url)
+    throw std::runtime_error("[parse_url] invalid url: " + url);
+
+  if (parsed_url->has_scheme() && parsed_url->scheme() != Session::scheme)
+    throw std::runtime_error("[parse_url] invalid scheme");
+
+  std::string host = parsed_url->host();
+  std::string port = parsed_url->has_port() ? std::string(parsed_url->port())
+                                            : Session::default_port;
+
+  return {host, port};
+}
 } // namespace http2_client

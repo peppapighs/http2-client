@@ -29,9 +29,14 @@ class session;
 class client {
 public:
   client(io_context &io_context, ssl::context &tls_context,
+         const std::string &url);
+  client(io_context &io_context, ssl::context &tls_context,
          const std::string &host, const std::string &port);
+
+  client(io_context &io_context, const std::string &url);
   client(io_context &io_context, const std::string &host,
          const std::string &port);
+
   ~client();
 
   awaitable<void> connect();

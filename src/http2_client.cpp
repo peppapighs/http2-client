@@ -1,8 +1,8 @@
 #include "http2_client.h"
 
-#include "http2.h"
 #include "session_tcp.h"
 #include "session_tls.h"
+#include "util.h"
 
 #include <cstdlib>
 #include <fstream>
@@ -10,9 +10,20 @@
 
 namespace http2_client {
 client::client(io_context &io_context, ssl::context &tls_context,
+               const std::string &url) {
+  auto [host, port] = parse_url<session_tls>(url);
+  session_ = std::make_shared<session_tls>(io_context, tls_context, host, port);
+}
+
+client::client(io_context &io_context, ssl::context &tls_context,
                const std::string &host, const std::string &port)
     : session_(
           std::make_shared<session_tls>(io_context, tls_context, host, port)) {}
+
+client::client(io_context &io_context, const std::string &url) {
+  auto [host, port] = parse_url<session_tcp>(url);
+  session_ = std::make_shared<session_tcp>(io_context, host, port);
+}
 
 client::client(io_context &io_context, const std::string &host,
                const std::string &port)
