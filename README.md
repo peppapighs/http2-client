@@ -34,3 +34,9 @@ build/http2-client -L "https://nghttp2.org" -m "GET" -v
 ## Notes
 
 Set environment variable `SSLKEYLOGFILE` to path of a file to TLS master secrets logging. This is useful for debugging TLS connections using Wireshark.
+
+## References
+
+- [nghttp2](https://nghttp2.org/): HTTP/2 C Library and tools
+- [nghttp2-asio](https://github.com/nghttp2/nghttp2-asio): A C++ asio-based HTTP/2 client/server library (original inspiration for this project)
+- [Boost.Asio](https://www.boost.org/doc/libs/master/doc/html/boost_asio.html): Boost Asynchronous I/O library
