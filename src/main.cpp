@@ -168,7 +168,7 @@ int main(int argc, char *argv[]) {
 
     if (scheme == "https") {
       auto tls_context = http2_client::create_context(
-          ssl::context::sslv23_client, vm.count("insecure"));
+          ssl::context::sslv23_client, !vm.count("insecure"));
       client = http2_client::client(io_context, tls_context, host, port);
     } else {
       if (vm.count("insecure") && !vm["insecure"].defaulted())
