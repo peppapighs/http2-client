@@ -172,7 +172,7 @@ int main(int argc, char *argv[]) {
       client = http2_client::client(io_context, tls_context, host, port);
     } else {
       if (vm.count("insecure") && !vm["insecure"].defaulted())
-        throw std::logic_error("--insecure is only supported "
+        throw std::logic_error("option 'insecure' is only supported "
                                "for https scheme");
       client = http2_client::client(io_context, host, port);
     }
