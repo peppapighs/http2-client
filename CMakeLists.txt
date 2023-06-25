@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 find_package(
   Boost
-  COMPONENTS url
+  COMPONENTS url program_options
   REQUIRED)
 find_package(OpenSSL REQUIRED)
 

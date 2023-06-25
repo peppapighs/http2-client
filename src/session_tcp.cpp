@@ -2,7 +2,6 @@
 
 namespace http2_client {
 const std::string session_tcp::scheme = "http";
-const std::string session_tcp::default_port = "80";
 
 session_tcp::session_tcp(io_context &io_context, const std::string &host,
                          const std::string &port)

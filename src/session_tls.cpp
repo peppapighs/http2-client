@@ -6,7 +6,6 @@
 
 namespace http2_client {
 const std::string session_tls::scheme = "https";
-const std::string session_tls::default_port = "443";
 
 session_tls::session_tls(io_context &io_context, ssl::context &tls_context,
                          const std::string &host, const std::string &port)

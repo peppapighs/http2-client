@@ -18,7 +18,6 @@ public:
   void shutdown_socket() override;
 
   static const std::string scheme;
-  static const std::string default_port;
 
 private:
   ip::tcp::socket socket_;

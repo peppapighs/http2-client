@@ -1,7 +1,7 @@
 #include "session.h"
 
-#include "util.h"
 #include "scope_guard.h"
+#include "util.h"
 
 #include <chrono>
 #include <iostream>
@@ -41,7 +41,15 @@ awaitable<void> session::connect() {
 
 awaitable<void> session::handle_deadline() {
   while (!is_terminated_) {
-    co_await deadline_timer_.async_wait(use_awaitable);
+    try {
+      co_await deadline_timer_.async_wait(use_awaitable);
+    } catch (const boost::system::system_error &error) {
+      if (error.code() != boost::asio::error::operation_aborted) {
+        std::cerr << "[handle_deadline] " << error.what() << std::endl;
+        terminate();
+        co_return;
+      }
+    }
     if (deadline_timer_.expiry() <= std::chrono::steady_clock::now()) {
       std::cerr << "[handle_timeout] timeout" << std::endl;
       deadline_timer_.expires_at(
@@ -220,8 +228,8 @@ awaitable<std::optional<response>> session::request(const std::string &method,
 
   auto res = build_response();
 
-  headers.clear();
-  body_stream_.clear();
+  headers_.clear();
+  body_stream_.str("");
   body_ = nullptr;
 
   co_return res;
@@ -241,12 +249,12 @@ response session::build_response() const {
   response res;
   for (auto &header : headers_) {
     if (header.first == ":status") {
-      res.status_ = std::stoi(header.second);
+      res.status = std::stoi(header.second);
       continue;
     }
-    res.headers_.emplace(std::move(header));
+    res.headers.emplace(std::move(header));
   }
-  res.body_ = body_stream_.str();
+  res.body = body_stream_.str();
 
   return res;
 }

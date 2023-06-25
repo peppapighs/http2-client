@@ -19,9 +19,9 @@ using body_generator =
     std::function<std::size_t(uint8_t *buf, std::size_t len, bool &eof)>;
 
 struct response {
-  int32_t status_;
-  header_map headers_;
-  std::string body_;
+  int32_t status;
+  header_map headers;
+  std::string body;
 };
 
 class session;
@@ -29,14 +29,11 @@ class session;
 class client {
 public:
   client(io_context &io_context, ssl::context &tls_context,
-         const std::string &url);
-  client(io_context &io_context, ssl::context &tls_context,
          const std::string &host, const std::string &port);
-
-  client(io_context &io_context, const std::string &url);
   client(io_context &io_context, const std::string &host,
          const std::string &port);
 
+  client();
   ~client();
 
   awaitable<void> connect();
