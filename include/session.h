@@ -9,9 +9,8 @@ using namespace boost::asio;
 
 class session {
 public:
-  session(io_context &io_context, ssl::context &tls_context,
-          const std::string &host, const std::string &port,
-          const std::string &scheme);
+  session(io_context &io_context, const std::string &host,
+          const std::string &port, const std::string &scheme);
   ~session();
 
   awaitable<void> connect();

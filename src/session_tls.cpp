@@ -7,7 +7,7 @@
 namespace http2_client {
 session_tls::session_tls(io_context &io_context, ssl::context &tls_context,
                          const std::string &host, const std::string &port)
-    : session(io_context, tls_context, host, port, "https"),
+    : session(io_context, host, port, "https"),
       socket_(io_context, tls_context) {
   socket_.set_verify_callback(ssl::host_name_verification(host));
 
@@ -22,8 +22,6 @@ session_tls::~session_tls() {}
 
 awaitable<void>
 session_tls::create_connection(ip::tcp::resolver::results_type endpoints) {
-  auto executor = co_await this_coro::executor;
-
   co_await boost::asio::async_connect(socket(), endpoints, use_awaitable);
   co_await socket_.async_handshake(ssl::stream_base::client, use_awaitable);
 

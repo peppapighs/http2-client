@@ -7,9 +7,8 @@
 #include <iostream>
 
 namespace http2_client {
-session::session(io_context &io_context, ssl::context &tls_context,
-                 const std::string &host, const std::string &port,
-                 const std::string &scheme)
+session::session(io_context &io_context, const std::string &host,
+                 const std::string &port, const std::string &scheme)
     : host_(host), port_(port), scheme_(scheme), resolver_(io_context),
       deadline_timer_(io_context), timeout_(30), response_timer_(io_context) {}
 
@@ -88,8 +87,6 @@ awaitable<void> session::handle_read() {
 }
 
 awaitable<void> session::handle_write() {
-  auto executor = co_await this_coro::executor;
-
   while (!is_terminated_ && !is_writing_ && !is_mem_op_blocked_) {
     if (data_ptr_) {
       std::copy_n(data_ptr_, data_len_,
@@ -166,8 +163,6 @@ awaitable<std::optional<response>> session::request(const std::string &method,
                                                     const std::string &path,
                                                     body_generator body,
                                                     header_map headers) {
-  auto executor = co_await this_coro::executor;
-
   auto uri = boost::urls::parse_origin_form(path);
   if (!uri) {
     std::cerr << "[request] invalid path: " << path << std::endl;

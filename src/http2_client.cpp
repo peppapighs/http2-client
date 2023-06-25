@@ -1,6 +1,7 @@
 #include "http2_client.h"
 
 #include "http2.h"
+#include "session_tcp.h"
 #include "session_tls.h"
 
 #include <cstdlib>
@@ -12,6 +13,10 @@ client::client(io_context &io_context, ssl::context &tls_context,
                const std::string &host, const std::string &port)
     : session_(
           std::make_shared<session_tls>(io_context, tls_context, host, port)) {}
+
+client::client(io_context &io_context, const std::string &host,
+               const std::string &port)
+    : session_(std::make_shared<session_tcp>(io_context, host, port)) {}
 
 client::~client() {}
 
