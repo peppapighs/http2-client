@@ -21,7 +21,7 @@ public:
   awaitable<std::optional<response>> request(const std::string &method,
                                              const std::string &path,
                                              body_generator body,
-                                             header_map headers);
+                                             const header_map &headers);
 
   void terminate();
   steady_timer &response_timer();

@@ -40,8 +40,8 @@ public:
   awaitable<void> close();
   awaitable<std::optional<response>> request(const std::string &method,
                                              const std::string &path,
-                                             body_generator body,
-                                             header_map headers);
+                                             body_generator body = nullptr,
+                                             const header_map &headers = {});
 
 private:
   std::shared_ptr<session> session_;

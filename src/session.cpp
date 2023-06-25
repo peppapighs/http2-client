@@ -170,7 +170,7 @@ awaitable<void> session::close() {
 awaitable<std::optional<response>> session::request(const std::string &method,
                                                     const std::string &path,
                                                     body_generator body,
-                                                    header_map headers) {
+                                                    const header_map &headers) {
   auto uri = boost::urls::parse_origin_form(path);
   if (!uri) {
     std::cerr << "[request] invalid path: " << path << std::endl;

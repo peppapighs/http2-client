@@ -39,8 +39,10 @@ http2_client::body_generator make_string_body(const std::string &data) {
     auto n = std::min(len, data.size() - offset);
     std::copy_n(data.data() + offset, n, buf);
     offset += n;
-    if (offset == data.size())
+    if (offset == data.size()) {
       eof = true;
+      offset = 0;
+    }
     return n;
   };
 }
@@ -54,8 +56,11 @@ http2_client::body_generator make_file_body(const std::string &path) {
     auto &data = *data_buffer;
     data.read(reinterpret_cast<char *>(buf), len);
     auto n = data.gcount();
-    if (n < len)
+    if (n < len) {
       eof = true;
+      data.clear();
+      data.seekg(0);
+    }
     return n;
   };
 }
@@ -69,21 +74,13 @@ std::string trim(const std::string &s) {
 }
 
 awaitable<void> run(http2_client::client &client, const std::string &method,
-                    const std::string &path, const std::string &data,
-                    const std::string &file_path,
+                    const std::string &path, http2_client::body_generator body,
                     const http2_client::header_map &headers, int iterations,
                     bool verbose) {
   co_await client.connect();
 
   for (int i = 0; i < iterations; i++) {
-    http2_client::body_generator body = nullptr;
-    if (!data.empty())
-      body = make_string_body(data);
-    else if (!file_path.empty())
-      body = make_file_body(file_path);
-
-    auto response =
-        co_await client.request(method, path, std::move(body), headers);
+    auto response = co_await client.request(method, path, body, headers);
     if (verbose && response) {
       std::cerr << "status: " << response->status << std::endl;
       for (auto &[name, value] : response->headers)
@@ -180,6 +177,12 @@ int main(int argc, char *argv[]) {
       client = http2_client::client(io_context, host, port);
     }
 
+    http2_client::body_generator body = nullptr;
+    if (vm.count("data"))
+      body = make_string_body(vm["data"].as<std::string>());
+    else if (vm.count("file"))
+      body = make_file_body(vm["file"].as<std::string>());
+
     http2_client::header_map headers;
     if (vm.count("header")) {
       for (auto &header : vm["header"].as<std::vector<std::string>>()) {
@@ -195,20 +198,16 @@ int main(int argc, char *argv[]) {
     if (iterations < 1)
       throw std::logic_error("[http2-client] invalid iterations");
 
-    std::string data = vm.count("data") ? vm["data"].as<std::string>() : "";
-    std::string file_path =
-        vm.count("file") ? vm["file"].as<std::string>() : "";
-
     co_spawn(io_context,
-             run(client, method, path, data, file_path, headers, iterations,
+             run(client, method, path, std::move(body), headers, iterations,
                  vm.count("verbose")),
              detached);
+
+    io_context.run();
   } catch (const std::exception &e) {
     std::cerr << "[http2-client] " << e.what() << std::endl;
     std::cerr << "Try '" << argv[0] << " -h' for more information."
               << std::endl;
     return 1;
   }
-
-  io_context.run();
 }

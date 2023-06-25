@@ -28,7 +28,7 @@ awaitable<void> client::close() { co_await session_->close(); }
 awaitable<std::optional<response>> client::request(const std::string &method,
                                                    const std::string &path,
                                                    body_generator body,
-                                                   header_map headers) {
+                                                   const header_map &headers) {
   co_return co_await session_->request(method, path, body, headers);
 }
 
