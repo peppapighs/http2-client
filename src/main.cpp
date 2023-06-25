@@ -10,14 +10,14 @@ using namespace boost::asio;
 
 void required_option(const po::variables_map &vm, const char *opt) {
   if (!vm.count(opt))
-    throw std::logic_error(std::string("Option '") + opt + "' is required.");
+    throw std::logic_error(std::string("option '") + opt + "' is required.");
 }
 
 void conflicting_options(const po::variables_map &vm, const char *opt1,
                          const char *opt2) {
   if (vm.count(opt1) && !vm[opt1].defaulted() && vm.count(opt2) &&
       !vm[opt2].defaulted())
-    throw std::logic_error(std::string("Conflicting options '") + opt1 +
+    throw std::logic_error(std::string("conflicting options '") + opt1 +
                            "' and '" + opt2 + "'.");
 }
 
@@ -25,7 +25,7 @@ void option_dependency(const po::variables_map &vm, const char *for_what,
                        const char *required_option) {
   if (vm.count(for_what) && !vm[for_what].defaulted())
     if (vm.count(required_option) == 0 || vm[required_option].defaulted())
-      throw std::logic_error(std::string("Option '") + for_what +
+      throw std::logic_error(std::string("option '") + for_what +
                              "' requires option '" + required_option + "'.");
 }
 
@@ -140,10 +140,10 @@ int main(int argc, char *argv[]) {
     auto parsed_url =
         boost::urls::parse_uri_reference(vm["location"].as<std::string>());
     if (!parsed_url)
-      throw std::logic_error("[http2-client] " + parsed_url.error().message());
+      throw std::logic_error(parsed_url.error().message());
 
     if (!parsed_url->has_scheme())
-      throw std::logic_error("[http2-client] missing url scheme");
+      throw std::logic_error("missing url scheme");
 
     std::string scheme = parsed_url->scheme();
     std::string host = parsed_url->host();
@@ -159,7 +159,7 @@ int main(int argc, char *argv[]) {
         port = "80";
         break;
       default:
-        throw std::logic_error("[http2-client] unsupported scheme");
+        throw std::logic_error("unsupported scheme");
       }
     }
 
@@ -172,7 +172,7 @@ int main(int argc, char *argv[]) {
       client = http2_client::client(io_context, tls_context, host, port);
     } else {
       if (vm.count("insecure") && !vm["insecure"].defaulted())
-        throw std::logic_error("[http2-client] --insecure is only supported "
+        throw std::logic_error("--insecure is only supported "
                                "for https scheme");
       client = http2_client::client(io_context, host, port);
     }
@@ -188,7 +188,7 @@ int main(int argc, char *argv[]) {
       for (auto &header : vm["header"].as<std::vector<std::string>>()) {
         auto pos = header.find(':');
         if (pos == std::string::npos)
-          throw std::logic_error("[http2-client] invalid header: " + header);
+          throw std::logic_error("invalid header: " + header);
         headers.emplace(trim(header.substr(0, pos)),
                         trim(header.substr(pos + 1)));
       }
@@ -196,7 +196,7 @@ int main(int argc, char *argv[]) {
 
     int iterations = vm["iterations"].as<int>();
     if (iterations < 1)
-      throw std::logic_error("[http2-client] invalid iterations");
+      throw std::logic_error("invalid iterations");
 
     co_spawn(io_context,
              run(client, method, path, std::move(body), headers, iterations,
