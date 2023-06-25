@@ -12,15 +12,15 @@ find_package(
   REQUIRED)
 find_package(OpenSSL REQUIRED)
 
-find_path(nghttp2_INCLUDE_DIRS "nghttp2/nghttp2.h")
-find_library(nghttp2_LIBRARIES NAMES nghttp2)
+find_path(NGHTTP2_INCLUDE_DIRS "nghttp2/nghttp2.h")
+find_library(NGHTTP2_LIBRARIES NAMES nghttp2)
 
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS ${PROJECT_SOURCE_DIR}/src/*.cpp)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 target_include_directories(
   ${PROJECT_NAME} PRIVATE ${PROJECT_SOURCE_DIR}/include ${Boost_INCLUDE_DIRS}
-                          ${OpenSSL_INCLUDE_DIRS} ${nghttp2_INCLUDE_DIRS})
+                          ${OPENSSL_INCLUDE_DIR} ${NGHTTP2_INCLUDE_DIRS})
 target_link_libraries(
-  ${PROJECT_NAME} PRIVATE ${Boost_LIBRARIES} ${OpenSSL_LIBRARIES}
-                          ${nghttp2_LIBRARIES})
+  ${PROJECT_NAME} PRIVATE ${Boost_LIBRARIES} ${OPENSSL_LIBRARIES}
+                          ${NGHTTP2_LIBRARIES})
